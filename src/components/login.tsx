@@ -1,8 +1,60 @@
-import { LogIn, Mail, Lock } from "lucide-react";
+import { LogIn, Mail, Lock, EyeOff, Eye } from "lucide-react";
 import programmer from "../assets/programmer.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 
 export function Login() {
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState('');
+
+  const loginUserFormSchema = z.object({
+    email: z.string()
+      .nonempty('O campo e-mail é obrigatório')
+      .email('Formato de e-mail inválido'),
+    password: z.string()
+      .min(8, 'Senha deve ter pelo menos 8 caracteres.')
+  });
+
+  type LoginUserFormData = z.infer<typeof loginUserFormSchema>;
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<LoginUserFormData>({
+    resolver: zodResolver(loginUserFormSchema)
+  });
+
+  async function loginUser(data: LoginUserFormData) {
+    try {
+      const response = await fetch('https://teste.reobote.tec.br/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data),
+      });
+  
+      const responseData = await response.json();
+  
+      if (response.ok) {
+        console.log(responseData);
+        navigate('/dashboard');
+      } else {
+        console.log('Login failed:', responseData);
+        setLoginError('Erro ao logar. Verifique suas credenciais.');
+      }
+    } catch (error) {
+      alert('Erro ao logar usuário:');
+      console.error('Erro ao logar usuário:', error);
+    }
+  }
+  
+
   return (
     <section className="w-full grid sm:grid-cols-1 lg:grid-cols-2">
       <div className="hidden lg:flex">
@@ -18,38 +70,48 @@ export function Login() {
             <div className="flex flex-col">
               <p className="text-white mt-[5px]">Entre com suas informações de cadastro.</p>
             </div>
-            <form className="flex flex-col pt-3">
+            <form className="flex flex-col pt-3" onSubmit={handleSubmit(loginUser)}>
               <label className="text-white font-medium">E-mail</label>
               <div className="relative mt-[5px] group">
                 <input 
                   type="email" 
-                  className="w-[335px] h-[44px] pl-10 bg-[#2F2F2F] focus:outline-none shadow-sm focus:ring-1 focus:ring-manz-400 focus:border-manz-500 border-[#4E4D4D] rounded-[4px] text-white placeholder-[#ABABAB]" 
+                  className={`w-[335px] h-[44px] pl-10 bg-[#2F2F2F] focus:outline-none shadow-sm ${errors.email ? 'focus:ring-1 focus:ring-red-500 focus:border-red-600' : 'focus:ring-1 focus:ring-manz-400 focus:border-manz-500'} border-[#4E4D4D] rounded-[4px] text-white placeholder-[#ABABAB]`} 
                   placeholder="Digite seu e-mail" 
+                  {...register('email')}
                 />
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"> 
-                  <Mail size={20} className="text-[#4F4F4F] group-focus-within:text-manz-500" />
-                </div>
-              </div>  
-              <label className="text-white font-medium pt-5">Senha</label>
-              <div className="relative group mt-[5px]">
-                <input 
-                  type="password" 
-                  className="w-[335px] h-[44px] pl-10 bg-[#2F2F2F] focus:outline-none shadow-sm focus:ring-1 focus:ring-manz-400 focus:border-manz-500 border-[#4E4D4D] rounded-[4px] text-white placeholder-[#ABABAB]" 
-                  placeholder="Digite sua senha" 
-                />
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"> 
-                  <Lock size={20} className="text-[#4F4F4F] group-focus-within:text-manz-500" />
+                  <Mail size={20} className={`text-[#4F4F4F] ${errors.email ? 'group-focus-within:text-red-500' : 'group-focus-within:text-manz-500'}`} />
                 </div>
               </div>
+              {errors.email && <p className="text-red-500 mt-2">{errors.email.message}</p>}
+              
+              <label className="text-white font-medium pt-5">Senha</label>
+              <div className="relative group mt-[5px]">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  className={`w-[335px] h-[44px] pl-10 pr-10 bg-[#2F2F2F] focus:outline-none shadow-sm ${errors.password ? 'focus:ring-1 focus:ring-red-500 focus:border-red-600' : 'focus:ring-1 focus:ring-manz-400 focus:border-manz-500'} border-[#4E4D4D] rounded-[4px] text-white placeholder-[#ABABAB]`}
+                  placeholder="Digite sua senha"
+                  {...register('password')}
+                />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"> 
+                  <Lock size={20} className={`text-[#4F4F4F] ${errors.password ? 'group-focus-within:text-red-500' : 'group-focus-within:text-manz-500'}`} />
+                </div>
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <EyeOff size={20} className={`text-[#4F4F4F] ${errors.password ? 'group-focus-within:text-red-500' : 'group-focus-within:text-manz-500'}`} /> : <Eye size={20} className={`text-[#4F4F4F] ${errors.password ? 'group-focus-within:text-red-500' : 'group-focus-within:text-manz-500'}`} />}
+                </div>
+              </div>
+              {errors.password && <p className="text-red-500 mt-2">{errors.password.message}</p>}
+              
               <div className="flex justify-between w-[335px] pt-5">
                 <div className="flex gap-[5px]">
-                  <input type="checkbox" className=" bg-[#2F2F2F] border-[#4E4D4D]" />
+                  <input type="checkbox" className=" accent-[#2F2F2F] border-[#4E4D4D]" />
                   <p className="text-white">Lembre-me</p>
                 </div>
                 <a href="/" className="text-manz-600 hover:text-manz-500 font-semibold hover:underline">Esqueci minha senha</a>
               </div>
-              <button className="bg-gradient-to-l from-manz-500 to-manz-600 hover:from-manz-600 hover:to-manz-700 mt-4 text-manz-950 font-semibold w-[335px] h-[51px] rounded-[4px] text-lg">ENTRAR</button>
-              <Link to="/signin" className="text-manz-600 hover:text-manz-500 w-[335px] text-center pt-4 hover:underline">Não tem uma conta? <span className="font-medium">Registre-se</span></Link>
+              {loginError && <p className="text-red-500 italic text-center mt-2">{loginError}</p>}
+              <button type="submit" className="bg-gradient-to-l from-manz-500 to-manz-600 hover:from-manz-600 hover:to-manz-700 mt-4 text-manz-950 font-semibold w-[335px] h-[51px] rounded-[4px] text-lg outline-none">Entrar</button>
+              <Link to="/signup" className="text-manz-600 hover:text-manz-500 w-[335px] text-center pt-4 hover:underline">Não tem uma conta? <span className="font-medium">Registre-se</span></Link>
             </form>
           </div>
         </div>
