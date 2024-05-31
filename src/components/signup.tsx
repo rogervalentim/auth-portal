@@ -47,20 +47,24 @@ export function Signup() {
         },
         body: JSON.stringify(data),
       });
-
+  
       if (response.ok) {
-        const responseData = await response.json();
-        console.log(responseData);
-        navigate('/')
-        toast.success("usuário cadastrado com sucesso!")
+        await response.json();
+        navigate('/');
+        toast.success("usuário cadastrado com sucesso!");
       } else {
         const errorData = await response.json();
-        console.log(errorData)
+        if (response.status === 422) { 
+          toast.error("Este e-mail já está cadastrado. Por favor, use outro e-mail.");
+        } else {
+          console.log(errorData);
+        }
       }
     } catch (error) {
       console.error('Erro ao criar usuário:', error);
     }
   }
+  
 
   return (
     <section className="w-full grid sm:grid-cols-1 lg:grid-cols-2">
@@ -168,7 +172,7 @@ export function Signup() {
               </div>
               {errors.password_confirmation && <span className="text-red-500 italic text-sm">{errors.password_confirmation.message}</span>}
               
-              <button type="submit" className="bg-gradient-to-l from-manz-500 to-manz-600 hover:from-manz-600 hover:to-manz-700 text-manz-950 font-semibold w-[335px] h-[51px] rounded-[4px] mt-6 text-lg">Cadastre-se</button>
+              <button type="submit" className="bg-gradient-to-l from-manz-500 to-manz-600 hover:from-manz-600 hover:to-manz-700 text-manz-950 font-semibold w-[335px] h-[51px] rounded-[4px] mt-6 text-lg outline-none">Cadastre-se</button>
               <Link to="/" className="text-manz-600 hover:text-manz-500 w-[335px] text-center pt-4 hover:underline">Já tem uma conta? <span className="font-medium">Clique aqui</span></Link>
             </form>
           </div>

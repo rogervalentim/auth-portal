@@ -2,12 +2,14 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
 import { App } from './app'
-import { BrowserRouter } from 'react-router-dom'
+import { HashRouter } from 'react-router-dom'
+import { Toaster } from 'sonner'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <HashRouter>
+    <Toaster richColors />
     <App />
-    </BrowserRouter>
+    </HashRouter>
   </React.StrictMode>,
 )
