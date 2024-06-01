@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 interface AuthContextProps {
   isAuthenticated: boolean;
   login: (data: LoginUserFormData) => void;
+  loginError: string;
   logout: () => void;
   token: string | null;
 }
@@ -22,7 +23,6 @@ export const AuthContext = createContext<AuthContextProps>({} as AuthContextProp
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [token, setToken] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loginError, setLoginError] = useState('');
   const navigate = useNavigate();
 
@@ -70,7 +70,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, token }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, loginError, logout, token }}>
       {children}
     </AuthContext.Provider>
   );

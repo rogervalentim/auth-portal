@@ -3,10 +3,11 @@ import { AuthContext } from '../context/auth-context';
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
-import { Button } from "../components/ui/button";
-import { ChevronRight, ChevronLeft } from 'lucide-react';
+import { Pagination } from './pagination';
+import { Link } from 'react-router-dom';
+import error from "../assets/error.svg";
 
-interface UserProps {
+export interface UserProps {
   id: number;
   name: string;
   email: string;
@@ -22,7 +23,6 @@ interface LoggedUserProps {
 export function Dashboard() {
   const { token, logout } = useContext(AuthContext);
   const [currentPage, setCurrentPage] = useState(1);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [itemsPerPage, setItemsPerPage] = useState(10); 
 
   const { data, isLoading: usersIsLoading } = useQuery<{
@@ -30,7 +30,7 @@ export function Dashboard() {
     logged_user: LoggedUserProps;
     number_users: number;
   }>({
-    queryKey: ["get-users"],
+    queryKey: ["get-users", currentPage, itemsPerPage],
     queryFn: async () => {
       const response = await fetch(`https://teste.reobote.tec.br/api/dashboard?page=${currentPage}&perPage=${itemsPerPage}`, {
         method: 'GET',
@@ -50,22 +50,32 @@ export function Dashboard() {
     return null;
   }
 
+  if(!token) {
+    return <>
+    <div className="h-screen flex flex-col items-center justify-center">
+    <img className="w-[500px] h-[400px]" src={error} alt="imagem de erro" />
+    <p className="text-manz-50">Usuário não autenticado</p>
+    <Link className="text-manz-500 hover:underline hover:text-manz-600" to="/">Faça o login</Link>
+    </div>
+    </>
+  }
+
   const { users, logged_user, number_users } = data || { users: [], logged_user: undefined, number_users: 0 };
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = users.slice(indexOfFirstItem, indexOfLastItem);
-
+  const totalPages = Math.ceil(number_users / itemsPerPage);
 
   return (
     <>
-      <div className="flex items-center justify-between px-5 bg-black h-16">
+      <div className="flex items-center justify-between px-5 bg-[#212121] h-16">
         <p className="text-manz-50">Olá <span>{logged_user?.name}</span></p>
-        <button className='rounded-md bg-red-600 hover:bg-red-700 text-manz-50 py-2 px-4' onClick={logout}>sair</button>
+        <button className='rounded-[4px] text-white bg-gradient-to-l from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 py-1 px-5' onClick={logout}>sair</button>
       </div>
       
-      <div className="pt-5">
-        <Table>
+      <div className="pt-5 w-full flex flex-col justify-center items-center">
+        <Table className="w-full lg:w-[90%] max-w-full overflow-x-auto">
           <TableHeader>
             <TableRow>
               <TableHead>Id</TableHead>
@@ -77,17 +87,17 @@ export function Dashboard() {
           <TableBody>
             {currentItems.map((user) => {
               return (
-                <TableRow key={user.id}>
-                  <TableCell className="text-zinc-300">
+                <TableRow className="text-zinc-300 hover:text-manz-50" key={user.id}>
+                  <TableCell>
                     {user.id}
                   </TableCell>
-                  <TableCell className="text-zinc-300">
+                  <TableCell>
                     {user.name}
                   </TableCell>
-                  <TableCell className="text-zinc-300">
+                  <TableCell>
                     {user.email}
                   </TableCell>
-                  <TableCell className="text-zinc-300">
+                  <TableCell>
                     {format(new Date(user.created_at), 'dd/MM/yyyy HH:mm:ss')}                  
                   </TableCell>
                 </TableRow>
@@ -96,28 +106,8 @@ export function Dashboard() {
           </TableBody>
         </Table>
         
-        <div className="flex text-sm items-center justify-between text-zinc-500 my-4 px-4">
-          <Button
-            onClick={() => setCurrentPage(currentPage === 1 ? 1 : currentPage - 1)}
-            disabled={currentPage === 1}
-            className="bg-zinc-950"
-          >
-            <ChevronLeft className="size-4" />
-            <span className="sr-only">Página anterior</span>          
-            </Button>
-          <div className="flex items-center">
-          <p className="mx-2 text-md text-zinc-300">{`Página ${currentPage} de ${Math.ceil(number_users / itemsPerPage)} páginas - total de ${number_users} usuários`}</p></div>
-          <Button
-            onClick={() => setCurrentPage(currentPage === Math.ceil(number_users / itemsPerPage) ? currentPage : currentPage + 1)}
-            disabled={currentPage === Math.ceil(number_users / itemsPerPage)}
-            className="bg-zinc-950"
-          >
-            <ChevronRight className="size-4" />
-            <span className="sr-only">Próxima página</span>
+        <Pagination currentPage={currentPage} setCurrentPage={setCurrentPage} itemsPerPage={itemsPerPage} setItemsPerPage={setItemsPerPage} totalPages={totalPages} number_users={number_users} currentItems={currentItems} />
 
-          </Button>
-
-        </div>
       </div>
     </>
   );

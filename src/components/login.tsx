@@ -8,7 +8,7 @@ import { useState, useContext } from "react";
 import { AuthContext } from "../context/auth-context";
 
 export function Login() {
-  const { login } = useContext(AuthContext);
+  const { login, loginError } = useContext(AuthContext);
   const [showPassword, setShowPassword] = useState(false);
 
   const loginUserFormSchema = z.object({
@@ -80,6 +80,7 @@ export function Login() {
               <button type="submit" className="bg-gradient-to-l from-manz-500 to-manz-600 hover:from-manz-600 hover:to-manz-700 mt-6 text-manz-950 font-semibold w-[335px] h-[51px] rounded-[4px] text-lg outline-none">Entrar</button>
               <Link to="/signup" className="text-manz-600 hover:text-manz-500 w-[335px] text-center pt-4 hover:underline">Não tem uma conta? <span className="font-medium">Registre-se</span></Link>
             </form>
+            {loginError && <p className="text-red-500">{loginError}</p>}
           </div>
         </div>
       </div>
