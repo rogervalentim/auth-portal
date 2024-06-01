@@ -1,15 +1,15 @@
 import { LogIn, Mail, Lock, EyeOff, Eye } from "lucide-react";
 import programmer from "../assets/programmer.png";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../context/auth-context";
 
 export function Login() {
-  const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
   const [showPassword, setShowPassword] = useState(false);
-  const [loginError, setLoginError] = useState('');
 
   const loginUserFormSchema = z.object({
     email: z.string()
@@ -29,32 +29,6 @@ export function Login() {
     resolver: zodResolver(loginUserFormSchema)
   });
 
-  async function loginUser(data: LoginUserFormData) {
-    try {
-      const response = await fetch('https://teste.reobote.tec.br/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data),
-      });
-  
-      const responseData = await response.json();
-  
-      if (response.ok) {
-        console.log(responseData);
-        navigate('/dashboard');
-      } else {
-        console.log('Login failed:', responseData);
-        setLoginError('Erro ao logar. Verifique suas credenciais.');
-      }
-    } catch (error) {
-      alert('Erro ao logar usuário:');
-      console.error('Erro ao logar usuário:', error);
-    }
-  }
-  
-
   return (
     <section className="w-full grid sm:grid-cols-1 lg:grid-cols-2">
       <div className="hidden lg:flex">
@@ -70,7 +44,7 @@ export function Login() {
             <div className="flex flex-col">
               <p className="text-white mt-[5px]">Entre com suas informações de cadastro.</p>
             </div>
-            <form className="flex flex-col pt-3" onSubmit={handleSubmit(loginUser)}>
+            <form className="flex flex-col pt-3" onSubmit={handleSubmit(login)}>
               <label className="text-white font-medium">E-mail</label>
               <div className="relative mt-[5px] group">
                 <input 
@@ -102,15 +76,8 @@ export function Login() {
               </div>
               {errors.password && <p className="text-red-500 mt-2">{errors.password.message}</p>}
               
-              <div className="flex justify-between w-[335px] pt-5">
-                <div className="flex gap-[5px]">
-                  <input type="checkbox" className=" accent-[#2F2F2F] border-[#4E4D4D]" />
-                  <p className="text-white">Lembre-me</p>
-                </div>
-                <a href="/" className="text-manz-600 hover:text-manz-500 font-semibold hover:underline">Esqueci minha senha</a>
-              </div>
-              {loginError && <p className="text-red-500 italic text-center mt-2">{loginError}</p>}
-              <button type="submit" className="bg-gradient-to-l from-manz-500 to-manz-600 hover:from-manz-600 hover:to-manz-700 mt-4 text-manz-950 font-semibold w-[335px] h-[51px] rounded-[4px] text-lg outline-none">Entrar</button>
+            
+              <button type="submit" className="bg-gradient-to-l from-manz-500 to-manz-600 hover:from-manz-600 hover:to-manz-700 mt-6 text-manz-950 font-semibold w-[335px] h-[51px] rounded-[4px] text-lg outline-none">Entrar</button>
               <Link to="/signup" className="text-manz-600 hover:text-manz-500 w-[335px] text-center pt-4 hover:underline">Não tem uma conta? <span className="font-medium">Registre-se</span></Link>
             </form>
           </div>
