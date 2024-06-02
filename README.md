@@ -1,30 +1,61 @@
-# React + TypeScript + Vite
+# 🔐 Auth Portal 
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<img src="./.github/favicon.ico" alt="logo" />
 
-Currently, two official plugins are available:
+## 💻 Deploy
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+<a href="https://auth-portal-taupe.vercel.app/">Clique aqui para ver o projeto</a>
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## 📝 Descrição
 
-- Configure the top-level `parserOptions` property like this:
+Este projeto consiste em um sistema de autenticação de usuários com três telas principais: Registro, Autenticação e Dashboard. O sistema se comunica com uma API para realizar as operações necessárias de registro, autenticação, exibição de usuários e logout.
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+## 🔧 Instalação
+
+Instalação com npm
+
+```bash
+  git clone "https://github.com/rogervalentim/auth-portal"
+  cd auth-portal
+  npm install 
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## 🔌 Como Rodar
+
+```bash
+  npm run dev
+```
+
+## 📊 Tecnologias e libs utilizadas 
+
+<ul>
+<li>React</li>
+<li>React Query</li>
+<li>Rect hook form</li>
+<li>Zod</li>
+<li>Tailwind css</li>
+<li>Tailwind merge</li>
+<li>Typescript</li>
+<li>Sonner - toast</li>
+<li>Lucide</li>
+</ul>
+
+## 📸 Imagens do Projeto
+
+<p>Login - rota '/'</p>
+
+<img src="./.github/login.png" alt="login page">
+
+<p>Signup - rota '/#/signup'</p>
+
+<img src="./.github/signup.png" alt="signup page">
+
+<p>Dashboad - rota '/#/dashboard</p>
+
+<img src="./.github/dashboard.png" alt="dashboard page">
+
+<p>Imagem de erro para usuários não autenticados</p>
+
+<img src="./.github/error.png" alt="error page">
+
